@@ -1,4 +1,4 @@
-class operations:
+class operations(object):
     'Base class of operations to be inherited by AWS_operations and Azure_operations'
     cloudprofile = None
     cloudprovider = None
@@ -9,36 +9,36 @@ class operations:
         self.cloudprovider = cvider
         self.filename = fn
 
-    def setProvider(vider):
+    def setProvider(self, vider):
         self.cloudprovider = vider
         return 0
 
-    def setProfile(profile):
+    def setProfile(self, profile):
         self.cloudprofile = profile
         return 0
 
-    def setFilename(fn):
+    def setFilename(self, fn):
         self.filename = fn
         return 0
 
-    def getProvider():
+    def getProvider(self):
         return self.cloudprovider
 
-    def getProfile():
+    def getProfile(self):
         return self.cloudprofile
 
-    def getFilename():
+    def getFilename(self):
         return self.filename
 
-    def get():
+    def get(self):
         pass
 
-    def put():
+    def put(self):
         pass
 
-    def delete():
+    def delete(self):
         pass
 
-    def checkExists():
+    def checkExists(self):
         pass
 
