@@ -3,8 +3,8 @@ from ops import operations
 class azure_operations(operations):
     'Defines ops for Azure'
 
-    def __init__(self, cfile, fn):
-        operations.__init__(self, cfile, "Azure", fn)
+    def __init__(self, profile, fn):
+        operations.__init__(self, profile, "Azure", fn)
 
     def get(self):
         print("Azure get")

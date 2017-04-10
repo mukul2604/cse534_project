@@ -4,9 +4,9 @@ class operations(object):
     cloudprovider = None
     filename = None
 
-    def __init__(self, cfile, cvider, fn):
-        self.cloudprofile = cfile
-        self.cloudprovider = cvider
+    def __init__(self, profile, provider, fn):
+        self.cloudprofile = profile
+        self.cloudprovider = provider
         self.filename = fn
 
     def setProvider(self, vider):
