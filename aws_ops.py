@@ -1,5 +1,5 @@
-from ops import operations
 import boto
+from ops import operations
 
 class aws_operations(operations):
     'Defines ops for AWS'
