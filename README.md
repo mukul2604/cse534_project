@@ -15,6 +15,9 @@ cf add --imp <filename>
 
 CLI to view current namespace - Basically ls like command
 ---------------------------------------------------------
+The command will be implemented such that it will go to the cloud
+and list the buckets intensionally. Do not display from a local copy.
+
 This should show the entire namespace
 cf ls
 

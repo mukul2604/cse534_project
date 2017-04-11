@@ -1,3 +1,4 @@
+import os
 import sys
 import csv
 from os.path import expanduser
@@ -49,7 +50,7 @@ class operations(object):
 
 
 ## Cloud profiles key handling
-
+GKEYS = []
 def getsProfileKeys():
     profile_keys = []
     path = expanduser('~')
@@ -78,6 +79,34 @@ def getsProfileKeys():
                 print("Warning: Missing " + vname + " in record.")
         profile_keys.append(prec)
 
+    GKEYS = profile_keys
     fil.close()
-    return profile_keys
+    return
+
+
+## Gets keyname from path
+def getsKeyNameFromPath(fn):
+    fn = fn.strip()
+    words = fn.split('/')
+    return words[-1]
+
+## Gets dir from path
+def getsDirFromPath(fn):
+    fn = fn.strip()
+    words = fn.split('/')
+    words = words[:-1]
+    pth = '/'
+    for k in words:
+        if k is not None:
+            pth += k
+            pth += '/'
+    return pth
+
+def getsPathFromUsergarbage(fn):
+    fn = fn.strip()
+    if fn[0] == '/':
+        return fn
+    else:
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        return dir_name + '/' + fn
 
