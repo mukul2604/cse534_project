@@ -1,4 +1,4 @@
-from ops import getsProfileKeys, profile_keys
+from ops import getsProfileKeys
 from aws_ops import aws_operations
 from azure_ops import azure_operations
 
@@ -12,7 +12,7 @@ def dosomething(obj):
     print obj.getFilename()
 
 
-getsProfileKeys()
+profile_keys = getsProfileKeys()
 print profile_keys
 obj = aws_operations("111", "/etc/passwd")
 dosomething(obj)

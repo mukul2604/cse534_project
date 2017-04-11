@@ -1,4 +1,5 @@
 import sys
+import csv
 from os.path import expanduser
 
 # Outline for defining operations on cloud obj stores
@@ -48,15 +49,11 @@ class operations(object):
 
 
 ## Cloud profiles key handling
-next_id = 0
-profile_keys = []
-#profile_record = {type = '', id = '', access = '', secret = ''}
 
 def getsProfileKeys():
-    global next_id
+    profile_keys = []
     path = expanduser('~')
     path += '/.cloudifier/keys'
-    print path
     fil = None
     try:
         fil = open(path)
@@ -65,28 +62,22 @@ def getsProfileKeys():
         print("Failed to fetch cloud accessing keys!")
         sys.exit(0)
 
-    #profile_record = {rtype = '', rid = '', access = '', secret = ''}
-    mrtype = None
-    maccess = None
-    msecret = None
+    properties = ['rid',
+                  'rtype',
+                  'accesskey',
+                  'secretkey',
+                  'bucketname']
 
-    # This code really depends on the correctness of cloudifier/keys file
-    for line in fil:
-        if 'type' in line:
-            # This is an AWS record
-            if 'AWS' in line:
-                mrtype = 'AWS'
-            elif 'Azure' in line:
-                mrtype = 'Azure'
-        elif 'access' in line:
-            maccess = line.split()[1].strip()
-        elif 'secret' in line:
-            msecret = line.split()[1].strip()
-        elif 'end' in line:
-            profile_record = {'rtype': mrtype, 'rid': next_id, 'access': maccess, 'secret': msecret}
-            profile_keys.append(profile_record)
-            next_id += 1
-        else:
-            continue
-    return
+    filreader = csv.DictReader(fil)
+    for row in filreader:
+        prec = {'rid': '', 'rtype': '', 'access': '', 'secret': '', 'bucket': ''}
+        for vname in properties:
+            if row[vname]:
+                prec[vname] = row[vname]
+            else:
+                print("Warning: Missing " + vname + " in record.")
+        profile_keys.append(prec)
+
+    fil.close()
+    return profile_keys
 
