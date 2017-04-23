@@ -87,10 +87,12 @@ def handle_request(tname, tnum, command, path, seg, imp):
         # Run the appropriate operation
         if (command == 0):
             db_file_add(properpath)
-            obj.put(properpath)
+            obj.put()
         elif (command == 1):
             db_file_remove(properpath)
-            obj.delete(properpath)
+            obj.delete()
+        elif (command == 2):
+            obj.get()
         else:
             # TODO more ops
             continue

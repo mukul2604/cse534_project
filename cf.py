@@ -57,7 +57,8 @@ def main(argv):
     command_str = ''
     command_str += str(command)
     command_str += '|'
-    command_str += str(filename)
+    if command != 2: # Send null filename in list
+        command_str += str(filename)
     command_str += '|'
     if segragate:
         command_str += '1'

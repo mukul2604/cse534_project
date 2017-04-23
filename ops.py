@@ -8,12 +8,12 @@ class operations(object):
     'Base class of operations to be inherited by AWS_operations and Azure_operations'
     cloudprofile = None
     cloudprovider = None
-    filename = None
+    path = None
 
     def __init__(self, profile, provider, fn):
         self.cloudprofile = profile
         self.cloudprovider = provider
-        self.filename = fn
+        self.path = fn
 
     def setProvider(self, provider):
         self.cloudprovider = provider
@@ -23,8 +23,8 @@ class operations(object):
         self.cloudprofile = profile
         return 0
 
-    def setFilename(self, fn):
-        self.filename = fn
+    def setPath(self, fn):
+        self.path = fn
         return 0
 
     def getProvider(self):
@@ -33,8 +33,8 @@ class operations(object):
     def getProfile(self):
         return self.cloudprofile
 
-    def getFilename(self):
-        return self.filename
+    def getPath(self):
+        return self.path
 
     def get(self):
         pass
@@ -106,6 +106,8 @@ def getsDirFromPath(fn):
 # User can send relative or absolute path
 # Convert all to absolute
 def getsPathFromUsergarbage(fn):
+    if (fn is None) or (fn == ''):
+        return ''
     fn = fn.strip()
     if fn[0] == '/':
         return fn

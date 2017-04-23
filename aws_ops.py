@@ -1,4 +1,5 @@
 import boto
+from boto.s3.key import Key
 from boto.s3.connection import S3Connection
 from ops import operations, getsKeyNameFromPath
 
@@ -13,7 +14,7 @@ class aws_operations(operations):
         # index   : Index of the profile we want to use
         # path    : Full file path followed by path name
         operations.__init__(self, profiles, "AWS", path)
-        conn_obj = S3Connection(profiles[index]['accesskey'], profiles[index]['secretkey'])
+        self.conn_obj = S3Connection(profiles[index]['accesskey'], profiles[index]['secretkey'])
 
         # TODO <<<<<<
         # More sophesticated code. If bucketname is empty then new random name
@@ -23,28 +24,31 @@ class aws_operations(operations):
         # If this is the first access to this profile then create the bucket
         # else create_bucket will raise exception. Then you get() this bucket.
         try:
-            bucket_obj = conn_obj.create_bucket(profiles[index]['bucketname'])
+            self.bucket_obj = self.conn_obj.create_bucket(profiles[index]['bucketname'])
         except:
-            bucket_obj = conn_obj.get_bucket(profiles[index]['bucketname'])
+            self.bucket_obj = self.conn_obj.get_bucket(profiles[index]['bucketname'])
+        return
+
 
     def get(self):
-        if path is None:
+        if (self.path is None) or (self.path == ''):
             # We are trying to list everything - eg. for ls command
-            print bucket_obj.list()
-        else:
-            keyname = getsKeyNameFromPath(path)
+            print('The following objects are available in the cloud:')
+            for item in self.bucket_obj.list():
+                print item
+            print(' ')
         return 0
 
     def put(self):
-        keyname = getsKeyNameFromPath(path)
-        k = Key(bucket_obj)
+        keyname = getsKeyNameFromPath(self.path)
+        k = Key(self.bucket_obj)
         k.key = keyname
-        k.set_contents_from_filename(path)
+        k.set_contents_from_filename(self.path)
         return 0
 
     def delete(self):
-        keyname = getsKeyNameFromPath(path)
-        k = Key(bucket_obj)
+        keyname = getsKeyNameFromPath(self.path)
+        k = Key(self.bucket_obj)
         k.key = keyname
         k.delete()
         return 0
