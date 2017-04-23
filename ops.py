@@ -15,8 +15,8 @@ class operations(object):
         self.cloudprovider = provider
         self.filename = fn
 
-    def setProvider(self, vider):
-        self.cloudprovider = vider
+    def setProvider(self, provider):
+        self.cloudprovider = provider
         return 0
 
     def setProfile(self, profile):
@@ -50,11 +50,11 @@ class operations(object):
 
 
 ## Cloud profiles key handling
-GKEYS = []
 def getsProfileKeys():
+    global GKEYS
     profile_keys = []
     path = expanduser('~')
-    path += '/.cloudifier/keys'
+    path += '/.cloudifier/keys.csv'
     fil = None
     try:
         fil = open(path)
@@ -79,9 +79,8 @@ def getsProfileKeys():
                 print("Warning: Missing " + vname + " in record.")
         profile_keys.append(prec)
 
-    GKEYS = profile_keys
     fil.close()
-    return
+    return profile_keys
 
 
 ## Gets keyname from path

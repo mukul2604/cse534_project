@@ -1,6 +1,6 @@
 import boto
-from ops import operations, getsKeyNameFromPath, GKEYS
 from boto.s3.connection import S3Connection
+from ops import operations, getsKeyNameFromPath
 
 class aws_operations(operations):
     'Defines ops for AWS'
