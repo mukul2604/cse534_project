@@ -29,18 +29,21 @@ def getsNetworkProfile():
     # I check the network stats and return the index of the
     # profile_keys array that you should use as your cloud provider
     # Right now I am not implemented so I return 0
+    # TODO
     return 0
 
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
 def db_file_add(path):
+    # TODO
     print 'Add: ' + str(path)
     return 0
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
 def db_file_remove(path):
+    # TODO
     print 'Remove: ' + str(path)
     return 0
 
@@ -79,7 +82,7 @@ def handle_request(tname, tnum, command, path, seg, imp):
             # profile_keys itself so that class constr can make connections
             obj = aws_operations(profile_keys, idx, properpath)
         else:
-            obj = aws_operations(profile_keys, 0, properpath) #<<<<<< Change!
+            obj = aws_operations(profile_keys, 0, properpath) #<<<<<< TODO
 
         # Run the appropriate operation
         if (command == 0):
@@ -89,6 +92,7 @@ def handle_request(tname, tnum, command, path, seg, imp):
             db_file_remove(properpath)
             obj.delete(properpath)
         else:
+            # TODO more ops
             continue
     return 0
 

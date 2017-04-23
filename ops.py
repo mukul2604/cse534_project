@@ -49,7 +49,7 @@ class operations(object):
         pass
 
 
-## Cloud profiles key handling
+## Parse the CSV with cloud keys into an array of dicts
 def getsProfileKeys():
     profile_keys = []
     path = expanduser('~')
@@ -83,6 +83,9 @@ def getsProfileKeys():
 
 
 ## Gets keyname from path
+# TODO Full path should be keyname. Minus the slash '/'
+# Because we are dumping in same bucket. Cloud services dont warn.
+# They overwrite.
 def getsKeyNameFromPath(fn):
     fn = fn.strip()
     words = fn.split('/')
@@ -100,6 +103,8 @@ def getsDirFromPath(fn):
             pth += '/'
     return pth
 
+# User can send relative or absolute path
+# Convert all to absolute
 def getsPathFromUsergarbage(fn):
     fn = fn.strip()
     if fn[0] == '/':
@@ -107,4 +112,3 @@ def getsPathFromUsergarbage(fn):
     else:
         dir_path = os.path.dirname(os.path.realpath(__file__))
         return dir_path + '/' + fn
-
