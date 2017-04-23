@@ -25,7 +25,6 @@ next_tid = 0
 #    threadreturns.append(0)
 
 
-
 def getsNetworkProfile():
     # I check the network stats and return the index of the
     # profile_keys array that you should use as your cloud provider
@@ -33,10 +32,24 @@ def getsNetworkProfile():
     return 0
 
 
+
+# Add remove the full path of the file from ~/.cloudifier/path_db file
+def db_file_add(path):
+    print 'Add: ' + str(path)
+    return 0
+
+
+# Add remove the full path of the file from ~/.cloudifier/path_db file
+def db_file_remove(path):
+    print 'Remove: ' + str(path)
+    return 0
+
+
+# The code that runs as a separate thread
+# We want to handle the case where an upload of 500 MB file can
+# continue in background while CLI and the server are free to
+# accept more requests
 def handle_request(tname, tnum, command, path, seg, imp):
-    # Lets not make AWS or Azure connections here
-    # Lets make them in their respective classes
-    # as handling here would be messy
     global profile_keys
 
     # User might give relative or abs path
@@ -60,11 +73,13 @@ def handle_request(tname, tnum, command, path, seg, imp):
         # Get the proper cloud's object
         pf = profile_keys[idx]
         if pf['rtype'] == 'AWS':
-            # Pass the profile_keys itself so that class constr can make connections
+            # Lets not make AWS or Azure connections here
+            # Lets make them in their respective classes
+            # as handling here would be messy. Pass the
+            # profile_keys itself so that class constr can make connections
             obj = aws_operations(profile_keys, idx, properpath)
         else:
-            #<<<<<< Change!
-            obj = aws_operations(profile_keys, idx, properpath)
+            obj = aws_operations(profile_keys, 0, properpath) #<<<<<< Change!
 
         # Run the appropriate operation
         if (command == 0):
@@ -77,11 +92,21 @@ def handle_request(tname, tnum, command, path, seg, imp):
             continue
     return 0
 
+# Can this string be safely converted to int?
+def isInteger(n):
+    try:
+        int(n)
+        return True
+    except:
+        return False
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         global next_tid
         resp = 'OK'
+        imp = -1
+        command = -1
+        segragate = -1
 
         # In linux, the max path length could be 4096 bytes
         self.data = self.request.recv(4200).strip()
@@ -94,11 +119,16 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print("Important file: " + words[3])
         print(' ')
         #<<<<<<<<
+
         next_tid += 1
         threadname = 'request_' + str(next_tid)
-        command = int(words[0]) #MAKE SAFE <<<<<<<
-        segragate = int(words[2])
-        imp = int(words[3])
+
+        if (isInteger(words[0])):
+            command = int(words[0])
+        if (isInteger(words[2])):
+            segragate = int(words[2])
+        if (isInteger(words[3])):
+            imp = int(words[3])
 
         try:
             thread.start_new_thread(handle_request,
