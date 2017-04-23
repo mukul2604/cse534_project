@@ -1,12 +1,11 @@
 #!/usr/bin/python
+import ops
 import sys
 import getopt
-from ops import getsProfileKeys
-from aws_ops import aws_operations
-from azure_ops import azure_operations
+import socket
 
-profile_keys = getsProfileKeys()
-
+SERVERHOST = '127.0.0.1'
+SERVERPORT = 7070
 
 def printsHelp():
     print("Usage: python cf.py <command> <parameters>")
@@ -20,7 +19,7 @@ def printsHelp():
     return 0
 
 def main(argv):
-    global profile_keys
+    #global profile_keys
     filename = ''
     command = 0
     segragate = False
@@ -54,13 +53,37 @@ def main(argv):
         print("Filename required with add or remove")
         sys.exit(0)
 
-    #<<<<<<<<
-    print command
-    print filename
-    print segragate
-    print important
+    # COMMAND | FILENAME | SEGRAGATE | IMPORTANT
+    command_str = ''
+    command_str += str(command)
+    command_str += '|'
+    command_str += str(filename)
+    command_str += '|'
+    if segragate:
+        command_str += '1'
+    else:
+        command_str += '0'
+    command_str += '|'
+    if important:
+        command_str += '1'
+    else:
+        command_str += '0'
 
+    received = ''
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.connect((SERVERHOST, SERVERPORT))
+        sock.sendall(command_str)
+        received = sock.recv(16)
+    except Exception as e:
+        print ("ERROR: Failed to connect to " + SERVERHOST + ". Reason: " + str(e))
+    finally:
+        sock.close()
 
+    if received == 'OK':
+        pass
+    else:
+        print(received)
 
     return 0
 

@@ -51,7 +51,6 @@ class operations(object):
 
 ## Cloud profiles key handling
 def getsProfileKeys():
-    global GKEYS
     profile_keys = []
     path = expanduser('~')
     path += '/.cloudifier/keys.csv'
@@ -96,7 +95,7 @@ def getsDirFromPath(fn):
     words = words[:-1]
     pth = '/'
     for k in words:
-        if k is not None:
+        if (k is not None) and (k != ''):
             pth += k
             pth += '/'
     return pth
@@ -107,5 +106,5 @@ def getsPathFromUsergarbage(fn):
         return fn
     else:
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        return dir_name + '/' + fn
+        return dir_path + '/' + fn
 
