@@ -1,0 +1,16 @@
+US East (N. Virginia)
+
+1MB - 0.38266992569
+10MB - 4.22131896019
+
+52.216.32.128 - 14ms
+64 bytes from 52.216.32.128: icmp_seq=6 ttl=42 time=14.3 ms
+
+
+Tokyo
+1MB - 1.92337799072
+10MB - 4.58002686501
+
+52.219.68.59
+64 bytes from 52.219.68.59: icmp_seq=1 ttl=37 time=213 ms
+rtt min/avg/max/mdev = 203.513/210.672/217.832/7.174 ms
