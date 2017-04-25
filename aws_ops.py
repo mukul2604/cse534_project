@@ -1,11 +1,11 @@
-from ops import operations
 import boto
+from ops import operations
 
 class aws_operations(operations):
     'Defines ops for AWS'
 
-    def __init__(self, cfile, fn):
-        operations.__init__(self, cfile, "AWS", fn)
+    def __init__(self, profile, fn):
+        operations.__init__(self, profile, "AWS", fn)
 
     def get(self):
         print("AWS get")

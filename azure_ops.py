@@ -2,12 +2,13 @@ from ops import operations
 from azure.storage.blob import BlockBlobService
 
 
+
 class AzureOperations(operations):
     """Defines ops for Azure"""
     block_blob_service = None
 
-    def __init__(self, cfile, filename):
-        operations.__init__(self, cfile, "Azure", filename)
+    def __init__(self):
+        operations.__init__(self, profile, "Azure", filename)
         conf_file = open(cfile, "r")
         config = {}
 
@@ -20,6 +21,7 @@ class AzureOperations(operations):
 
     def find_bucket_name(self):
         return bucket_name
+
 
     def get(self):
         # find some api or do we need to pass bucket name exclusively as given in the example.
