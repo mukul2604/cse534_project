@@ -1,4 +1,6 @@
+import os
 import sys
+import csv
 from os.path import expanduser
 
 # Outline for defining operations on cloud obj stores
@@ -6,23 +8,23 @@ class operations(object):
     'Base class of operations to be inherited by AWS_operations and Azure_operations'
     cloudprofile = None
     cloudprovider = None
-    filename = None
+    path = None
 
     def __init__(self, profile, provider, fn):
         self.cloudprofile = profile
         self.cloudprovider = provider
-        self.filename = fn
+        self.path = fn
 
-    def setProvider(self, vider):
-        self.cloudprovider = vider
+    def setProvider(self, provider):
+        self.cloudprovider = provider
         return 0
 
     def setProfile(self, profile):
         self.cloudprofile = profile
         return 0
 
-    def setFilename(self, fn):
-        self.filename = fn
+    def setPath(self, fn):
+        self.path = fn
         return 0
 
     def getProvider(self):
@@ -31,8 +33,8 @@ class operations(object):
     def getProfile(self):
         return self.cloudprofile
 
-    def getFilename(self):
-        return self.filename
+    def getPath(self):
+        return self.path
 
     def get(self):
         pass
@@ -47,16 +49,11 @@ class operations(object):
         pass
 
 
-## Cloud profiles key handling
-next_id = 0
-profile_keys = []
-#profile_record = {type = '', id = '', access = '', secret = ''}
-
+## Parse the CSV with cloud keys into an array of dicts
 def getsProfileKeys():
-    global next_id
+    profile_keys = []
     path = expanduser('~')
-    path += '/.cloudifier/keys'
-    print path
+    path += '/.cloudifier/keys.csv'
     fil = None
     try:
         fil = open(path)
@@ -65,28 +62,55 @@ def getsProfileKeys():
         print("Failed to fetch cloud accessing keys!")
         sys.exit(0)
 
-    #profile_record = {rtype = '', rid = '', access = '', secret = ''}
-    mrtype = None
-    maccess = None
-    msecret = None
+    properties = ['rid',
+                  'rtype',
+                  'accesskey',
+                  'secretkey',
+                  'bucketname']
 
-    # This code really depends on the correctness of cloudifier/keys file
-    for line in fil:
-        if 'type' in line:
-            # This is an AWS record
-            if 'AWS' in line:
-                mrtype = 'AWS'
-            elif 'Azure' in line:
-                mrtype = 'Azure'
-        elif 'access' in line:
-            maccess = line.split()[1].strip()
-        elif 'secret' in line:
-            msecret = line.split()[1].strip()
-        elif 'end' in line:
-            profile_record = {'rtype': mrtype, 'rid': next_id, 'access': maccess, 'secret': msecret}
-            profile_keys.append(profile_record)
-            next_id += 1
-        else:
-            continue
-    return
+    filreader = csv.DictReader(fil)
+    for row in filreader:
+        prec = {'rid': '', 'rtype': '', 'access': '', 'secret': '', 'bucket': ''}
+        for vname in properties:
+            if row[vname]:
+                prec[vname] = row[vname]
+            else:
+                print("Warning: Missing " + vname + " in record.")
+        profile_keys.append(prec)
 
+    fil.close()
+    return profile_keys
+
+
+## Gets keyname from path
+# TODO Full path should be keyname. Minus the slash '/'
+# Because we are dumping in same bucket. Cloud services dont warn.
+# They overwrite.
+def getsKeyNameFromPath(fn):
+    fn = fn.strip()
+    words = fn.split('/')
+    return words[-1]
+
+## Gets dir from path
+def getsDirFromPath(fn):
+    fn = fn.strip()
+    words = fn.split('/')
+    words = words[:-1]
+    pth = '/'
+    for k in words:
+        if (k is not None) and (k != ''):
+            pth += k
+            pth += '/'
+    return pth
+
+# User can send relative or absolute path
+# Convert all to absolute
+def getsPathFromUsergarbage(fn):
+    if (fn is None) or (fn == ''):
+        return ''
+    fn = fn.strip()
+    if fn[0] == '/':
+        return fn
+    else:
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        return dir_path + '/' + fn
