@@ -1,35 +1,68 @@
 import boto
-import datetime
 from boto.s3.key import Key
 from boto.s3.connection import S3Connection
-import time
 from boto.s3.connection import Location
-#print '\n'.join(i for i in dir(Location) if i[0].isupper())
 
-f1 = open('/home/salman/Downloads/rootkey.csv', 'r')
-a_key_array = f1.read()
-a_key = a_key_array.splitlines()
-access_key = a_key[0].split("AWSAccessKeyId=")[1]
-security_key = a_key[1].split("AWSSecretKey=")[1]
 
-c = S3Connection(access_key, security_key)
-#b = c.get_bucket('salman91') # substitute your bucket name here
-b = c.get_bucket('testtokyo534') # substitute your bucket name here
-bucket_location = b.get_location()
-#print bucket_location
-if bucket_location:
-    conn = boto.s3.connect_to_region(bucket_location,  aws_access_key_id=access_key, aws_secret_access_key=security_key)
-    b = conn.get_bucket('testtokyo534')
+import time
+from azure.storage.blob import BlockBlobService
+from azure.storage.blob import ContentSettings
+import csv
 
-#c = S3Connection(access_key, security_key)
-#c = boto.s3.connect_to_region('APNortheast')
-#b = c.get_bucket('testtokyo534') # substitute your bucket name here
-k = Key(b)
-k.key = '1Mb.txt'
-start_time = time.time()
-#k.set_contents_from_string('This is a test of S')
-k.set_contents_from_filename('1Mb.txt')
-end_time = time.time()
+filename='1Mb.txt'
 
-print end_time - start_time
+f1 = open('/home/salman/cse534_project/keys/keys.csv', 'r')
+a_key_array = csv.DictReader(f1, delimiter=',')
+#a_key = a_key_array.splitlines()
+#account_name = a_key[0].split("azure_account_name=")[1]
+#container_name = a_key[1].split("azure_container=")[1]
+#access_key = a_key[2].split("azure_access_key=")[1]
 
+rows = list(a_key_array)
+
+result=[]
+index=0
+for row in rows:
+    if (row['account_type']=='AZURE'):
+        print row['container_name']
+        block_blob_service = None
+        block_blob_service = BlockBlobService(account_name=row['account_name'], account_key=row['access_key'])
+
+#generator = block_blob_service.list_blobs(container_name)
+#for blob in generator:
+#    print(blob.name)
+
+        start_time = time.time()
+        block_blob_service.create_blob_from_path(
+        row['container_name'],
+        filename,
+        filename
+        )
+        end_time = time.time()
+        result.append (end_time - start_time)
+        print result[index]
+        index = index +1
+
+    elif (row['account_type']=='AWS'):
+        print row['container_name']    
+        c = S3Connection(row['access_key'], row['security_key'])
+        b = c.get_bucket(row['container_name']) # substitute your bucket name here
+        bucket_location = b.get_location()
+        #print bucket_location
+        if bucket_location:
+            conn = boto.s3.connect_to_region(bucket_location,  aws_access_key_id=row['access_key'], aws_secret_access_key=row['security_key'])
+            b = conn.get_bucket(row['container_name'])
+
+        k = Key(b)
+        k.key = filename
+        start_time = time.time()
+        k.set_contents_from_filename(filename)
+        end_time = time.time()
+
+        result.append (end_time - start_time)
+        print result[index]
+        index = index +1
+
+min_value=min(result)
+min_index=result.index(min_value)
+print min_index
