@@ -52,7 +52,7 @@ def db_file_remove(path):
 # We want to handle the case where an upload of 500 MB file can
 # continue in background while CLI and the server are free to
 # accept more requests
-def handle_request(tname, tnum, command, path, seg, imp):
+ef handle_request(tname, tnum, command, path, seg, imp):
     global profile_keys
 
     # User might give relative or abs path
@@ -70,6 +70,8 @@ def handle_request(tname, tnum, command, path, seg, imp):
         loop = 1
         idx = getsNetworkProfile()
 
+
+    # <<<<<<<< TODO What happens when sending fails?
     while loop > 0:
         loop -= 1
 
