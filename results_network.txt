@@ -1,0 +1,44 @@
+US East (N. Virginia)
+
+1MB - 0.38266992569
+10MB - 4.22131896019
+
+52.216.32.128 - 14ms
+64 bytes from 52.216.32.128: icmp_seq=6 ttl=42 time=14.3 ms
+
+10 packets transmitted, 10 received, 0% packet loss, time 9014ms
+rtt min/avg/max/mdev = 11.131/12.446/13.513/0.771 ms
+
+
+Tokyo
+1MB - 1.92337799072
+10MB - 4.58002686501
+
+52.219.68.59
+64 bytes from 52.219.68.59: icmp_seq=1 ttl=37 time=213 ms
+rtt min/avg/max/mdev = 203.513/210.672/217.832/7.174 ms
+
+Singapore
+10 packets transmitted, 10 received, 0% packet loss, time 9013ms
+rtt min/avg/max/mdev = 247.095/249.583/260.515/3.765 ms
+
+Ireland
+10 packets transmitted, 10 received, 0% packet loss, time 9016ms
+rtt min/avg/max/mdev = 85.802/87.029/88.565/0.817 ms
+
+Azure
+-----------------------------------------
+US East (N. Virginia)
+
+1MB - 0.707217931747
+10MB - 1.36440205574
+52.239.152.4
+
+
+asia-india
+1 MB- 1.79244112968
+10MB - 3.21759486198
+
+london uk
+1MB- 2.02113699913
+10MB - 1.54270911217
