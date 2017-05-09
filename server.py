@@ -4,7 +4,7 @@ import thread
 import SocketServer
 from aws_ops import aws_operations
 from azure_ops import azure_operations
-
+import network_test
 
 #****************#
 # TUNABLE PARAMS #
@@ -30,7 +30,9 @@ def getsNetworkProfile():
     # profile_keys array that you should use as your cloud provider
     # Right now I am not implemented so I return 0
     # TODO
-    return 0
+    profile_keys_idx = network_test.getNetworkProfile()
+    print profile_keys_idx
+    return profile_keys_idx[0]
 
 
 

@@ -9,60 +9,69 @@ from azure.storage.blob import BlockBlobService
 from azure.storage.blob import ContentSettings
 import csv
 
-filename='1Mb.txt'
+import os
+import sys
 
-f1 = open('/home/salman/cse534_project/keys/keys.csv', 'r')
-a_key_array = csv.DictReader(f1, delimiter=',')
-#a_key = a_key_array.splitlines()
-#account_name = a_key[0].split("azure_account_name=")[1]
-#container_name = a_key[1].split("azure_container=")[1]
-#access_key = a_key[2].split("azure_access_key=")[1]
+def getNetworkProfile():
+    filename='1Mb.txt'
+    key_path = os.path.expanduser('~/.cloudifier/keys.csv')
 
-rows = list(a_key_array)
+    f1 = open(key_path, 'r')
+    a_key_array = csv.DictReader(f1, delimiter=',')
 
-result=[]
-index=0
-for row in rows:
-    if (row['account_type']=='AZURE'):
-        print row['container_name']
-        block_blob_service = None
-        block_blob_service = BlockBlobService(account_name=row['account_name'], account_key=row['access_key'])
+    rows = list(a_key_array)
 
-#generator = block_blob_service.list_blobs(container_name)
-#for blob in generator:
-#    print(blob.name)
+    result=[]
+    index=0
+    for row in rows:
+        if (row['rtype']=='AZURE'):
+         #   print row['bucketname']
+            block_blob_service = None
+            block_blob_service = BlockBlobService(account_name=row['accesskey'], account_key=row['secretkey'])
 
-        start_time = time.time()
-        block_blob_service.create_blob_from_path(
-        row['container_name'],
-        filename,
-        filename
-        )
-        end_time = time.time()
-        result.append (end_time - start_time)
-        print result[index]
-        index = index +1
+            start_time = time.time()
+            block_blob_service.create_blob_from_path(
+            row['bucketname'],
+            filename,
+            filename
+            )
+            end_time = time.time()
+            result.append (end_time - start_time)
+          #  print result[index]
+            index = index +1
 
-    elif (row['account_type']=='AWS'):
-        print row['container_name']    
-        c = S3Connection(row['access_key'], row['security_key'])
-        b = c.get_bucket(row['container_name']) # substitute your bucket name here
-        bucket_location = b.get_location()
-        #print bucket_location
-        if bucket_location:
-            conn = boto.s3.connect_to_region(bucket_location,  aws_access_key_id=row['access_key'], aws_secret_access_key=row['security_key'])
-            b = conn.get_bucket(row['container_name'])
+        elif (row['rtype']=='AWS'):
+#            print row['bucketname']    
+            c = S3Connection(row['accesskey'], row['secretkey'])
+            b = c.get_bucket(row['bucketname']) # substitute your bucket name here
+            bucket_location = b.get_location()
+            #print bucket_location
+            if bucket_location:
+                conn = boto.s3.connect_to_region(bucket_location,  aws_access_key_id=row['accesskey'], aws_secret_access_key=row['secretkey'])
+                b = conn.get_bucket(row['bucketname'])
 
-        k = Key(b)
-        k.key = filename
-        start_time = time.time()
-        k.set_contents_from_filename(filename)
-        end_time = time.time()
+            k = Key(b)
+            k.key = filename
+            start_time = time.time()
+            k.set_contents_from_filename(filename)
+            end_time = time.time()
 
-        result.append (end_time - start_time)
-        print result[index]
-        index = index +1
+            result.append (end_time - start_time)
+           # print result[index]
+            index = index +1
 
-min_value=min(result)
-min_index=result.index(min_value)
-print min_index
+#    min_value=min(result)
+#    min_index=result.index(min_value)
+#    print min_index
+
+    net_profiles = [i[0] for i in sorted(enumerate(result), key=lambda x:x[1])]
+ #   print net_profiles
+    return net_profiles
+
+def main():
+    getNetworkProfile()
+    return 0
+
+if __name__ == "__main__":
+    main()
+    sys.exit(0)
