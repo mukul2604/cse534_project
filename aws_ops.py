@@ -29,13 +29,12 @@ class aws_operations(operations):
             self.bucket_obj = self.conn_obj.get_bucket(profiles[index]['bucketname'])
         return
 
-
     def get(self):
         if (self.path is None) or (self.path == ''):
             # We are trying to list everything - eg. for ls command
             print('The following objects are available in the cloud:')
             for item in self.bucket_obj.list():
-                print item
+                print(item)
             print(' ')
         return 0
 
@@ -52,7 +51,6 @@ class aws_operations(operations):
         k.key = keyname
         k.delete()
         return 0
-
 
     def checkExists(self):
         print("AWS check exists")

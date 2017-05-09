@@ -37,14 +37,14 @@ def getsNetworkProfile():
 # Add remove the full path of the file from ~/.cloudifier/path_db file
 def db_file_add(path):
     # TODO
-    print 'Add: ' + str(path)
+    print('Add: ' + str(path))
     return 0
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
 def db_file_remove(path):
     # TODO
-    print 'Remove: ' + str(path)
+    print('Remove: ' + str(path))
     return 0
 
 
@@ -81,6 +81,8 @@ def handle_request(tname, tnum, command, path, seg, imp):
             # as handling here would be messy. Pass the
             # profile_keys itself so that class constr can make connections
             obj = aws_operations(profile_keys, idx, properpath)
+        elif pf['rtype'] == 'AZURE':
+            obj = azure_operations(profile_keys, idx, properpath)
         else:
             obj = aws_operations(profile_keys, 0, properpath) #<<<<<< TODO
 
