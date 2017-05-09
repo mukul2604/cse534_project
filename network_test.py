@@ -24,47 +24,59 @@ def getNetworkProfile():
     index=0
     for row in rows:
         if (row['rtype']=='AZURE'):
-         #   print row['bucketname']
-            block_blob_service = None
-            block_blob_service = BlockBlobService(account_name=row['accesskey'], account_key=row['secretkey'])
+            print row['bucketname']
+            try:
+                block_blob_service = None
+                block_blob_service = BlockBlobService(account_name=row['accesskey'], account_key=row['secretkey'])
 
-            start_time = time.time()
-            block_blob_service.create_blob_from_path(
-            row['bucketname'],
-            filename,
-            filename
-            )
-            end_time = time.time()
-            result.append (end_time - start_time)
-          #  print result[index]
-            index = index +1
+                start_time = time.time()
+                block_blob_service.create_blob_from_path(
+                row['bucketname'],
+                filename,
+                filename
+                )
+                end_time = time.time()
+                result.append (end_time - start_time)
+                print result[index]
+                index = index +1
+            except:
+                result.append(sys.maxsize)
+                index = index +1
+                print "Error Connecting to", row['rtype'], " bucket: ", row['bucketname']
 
         elif (row['rtype']=='AWS'):
-#            print row['bucketname']    
-            c = S3Connection(row['accesskey'], row['secretkey'])
-            b = c.get_bucket(row['bucketname']) # substitute your bucket name here
-            bucket_location = b.get_location()
-            #print bucket_location
-            if bucket_location:
-                conn = boto.s3.connect_to_region(bucket_location,  aws_access_key_id=row['accesskey'], aws_secret_access_key=row['secretkey'])
-                b = conn.get_bucket(row['bucketname'])
+            print row['bucketname']   
+            try:
+                c = S3Connection(row['accesskey'], row['secretkey'])
+                b = c.get_bucket(row['bucketname']) # substitute your bucket name here
+                
+        
+                bucket_location = b.get_location()
+                #print bucket_location
+                if bucket_location:
+                    conn = boto.s3.connect_to_region(bucket_location,  aws_access_key_id=row['accesskey'], aws_secret_access_key=row['secretkey'])
+                    b = conn.get_bucket(row['bucketname'])
 
-            k = Key(b)
-            k.key = filename
-            start_time = time.time()
-            k.set_contents_from_filename(filename)
-            end_time = time.time()
+                k = Key(b)
+                k.key = filename
+                start_time = time.time()
+                k.set_contents_from_filename(filename)
+                end_time = time.time()
 
-            result.append (end_time - start_time)
-           # print result[index]
-            index = index +1
+                result.append (end_time - start_time)
+                print result[index]
+                index = index +1
+            except:
+                result.append(sys.maxsize)
+                index = index +1
+                print "Error Connecting to", row['rtype'], " bucket: ", row['bucketname']
 
     min_value=min(result)
     min_index=result.index(min_value)
 #    print min_index
 
     net_profiles = [i[0] for i in sorted(enumerate(result), key=lambda x:x[1])]
- #   print net_profiles
+    print net_profiles
     return net_profiles
 
 def main():
