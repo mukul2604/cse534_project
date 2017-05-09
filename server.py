@@ -3,7 +3,7 @@ import ops
 import thread
 import SocketServer
 from aws_ops import aws_operations
-from azure_ops import azure_operations
+from azure_ops import AzureOperations
 import network_test
 
 #****************#
