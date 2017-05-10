@@ -28,7 +28,6 @@ class aws_operations(operations):
             self.bucket_obj = self.conn_obj.get_bucket(profiles[index]['bucketname'])
         return
 
-
     def get(self):
         ret = ''
         if (self.path is None) or (self.path == ''):
@@ -61,7 +60,6 @@ class aws_operations(operations):
         k.key = keyname
         k.delete()
         return ret
-
 
     def checkExists(self):
         ret = ''

@@ -7,7 +7,7 @@ import SocketServer
 import network_test
 from os.path import expanduser
 from aws_ops import aws_operations
-from azure_ops import AzureOperations
+from azure_ops import azure_operations
 
 #****************#
 # TUNABLE PARAMS #
@@ -36,6 +36,7 @@ def getsNetworkProfile():
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
+
 def db_file_add(ppath):
     path = ops.getsKeyNameFromPath(ppath)
     fil = open(PATHDB, 'a')
@@ -46,6 +47,7 @@ def db_file_add(ppath):
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
+
 def db_file_remove(ppath):
     path = ops.getsKeyNameFromPath(ppath)
     fil = open(PATHDB, 'r+')
@@ -100,8 +102,10 @@ def handle_request (tname, tnum, command, path, seg, imp):
             # as handling here would be messy. Pass the
             # profile_keys itself so that class constr can make connections
             obj = aws_operations(profile_keys, idx, properpath)
+        elif pf['rtype'] == 'AZURE':
+            obj = azure_operations(profile_keys, idx, properpath)
         else:
-            obj = aws_operations(profile_keys, 0, properpath) #<<<<<< TODO
+            print("Unknown service type")
 
         # Run the appropriate operation
         try:

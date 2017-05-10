@@ -1,54 +1,60 @@
 from ops import operations
+from ops import getsKeyNameFromPath
 from azure.storage.blob import BlockBlobService
+from azure.storage.blob import PublicAccess
 
 
-
-class AzureOperations(operations):
+class azure_operations(operations):
     """Defines ops for Azure"""
     block_blob_service = None
+    bucket_name = None
 
-    def __init__(self):
-        operations.__init__(self, profile, "Azure", filename)
-        conf_file = open(cfile, "r")
-        config = {}
+    def __init__(self, profiles, index, path):
+        operations.__init__(self, profiles, "Azure", path)
 
-        for line in conf_file:
-            k, v = line.strip().split('=')
-            config[k.strip()] = v.strip()
-        account_name = config['account_name']
-        access_key   = config['access_key']
-        self.block_blob_service = BlockBlobService(account_name= account_name, account_key= access_key)
+        account_name = profiles[index]['accesskey']
+        access_key = profiles[index]['secretkey']
+        self.block_blob_service = BlockBlobService(account_name=account_name, account_key=access_key)
+        self.bucket_name = profiles[index]['bucketname']
 
-    def find_bucket_name(self):
-        return bucket_name
-
+        try:
+            self.block_blob_service.create_container(self.bucket_name, public_access=PublicAccess.Container)
+        except Exception:
+            pass
 
     def get(self):
-        # find some api or do we need to pass bucket name exclusively as given in the example.
-        bucket_name = find_bucket_name()
-        content = self.block_blob_service.get_blob_to_path(bucket_name, self.filename + 'blob', self.filename)
-        print("Azure get")
-        return content
+        ret = ''
+        if (self.path is None) or (self.path == ''):
+            generator = self.block_blob_service.list_blobs(self.bucket_name)
+            for blob in generator:
+                ret += blob.name + "\n"
+        else:
+            path = getsKeyNameFromPath(self.path)
+            self.block_blob_service.get_blob_to_path(self.bucket_name,
+                                                           path,
+                                                           path)
+            ret += 'Download Done'
+
+        return ret
 
     def put(self):
-        bucket_name = find_bucket_name()
+        path = getsKeyNameFromPath(self.path)
         self.block_blob_service.create_blob_from_path(
-            bucket_name,  # container  should user provide the name
-            self.filename + 'blob',  # to be uploaded object
-            self.filename,   # real file path
+            self.bucket_name,  # container  should user provide the name
+            path,  # to be uploaded object
+            path,   # real file path
         )
-        print("Azure put")
-        return 0
+        return "Put Done"
 
     def delete(self):
-        self.block_blob_service.delete_blob('mycontainer', self.filename + 'blob')
-        print("Azure delete")
-        return 0
+        path = getsKeyNameFromPath(self.path)
+        self.block_blob_service.delete_block(self.bucket_name, path)
+        return "Delete Done"
 
     def create(self):
         # create container
-        return 0
+        return "Done"
 
     def checkExists(self):
         print("Azure check exists")
-        return 0
+        return "Done"
