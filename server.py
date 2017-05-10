@@ -14,7 +14,7 @@ from azure_ops import AzureOperations
 #****************#
 SERVERPORT = 7070  # Default port on which the server listens
 MAX_THREADS = 100  # How many parallel requests can be handled
-homepath = path = expanduser('~')
+homepath = expanduser('~')
 PATHDB = homepath + '/.cloudifier/path_db' # Where is the DB of added files
 TWAIT_TIMER = 1 # How long to wait for a thread (sec)
 
@@ -30,10 +30,6 @@ for i in range(MAX_THREADS):
 
 
 def getsNetworkProfile():
-    # I check the network stats and return the index of the
-    # profile_keys array that you should use as your cloud provider
-    # Right now I am not implemented so I return 0
-    # TODO
     #profile_keys_idx = network_test.getNetworkProfile()
     #print profile_keys_idx
     #return profile_keys_idx[0]
@@ -41,8 +37,8 @@ def getsNetworkProfile():
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
-def db_file_add(path):
-    #print 'Add: ' + str(PATHDB) + str(path)
+def db_file_add(ppath):
+    path = ops.getsKeyNameFromPath(ppath)
     fil = open(PATHDB, 'a')
     fil.write(path)
     fil.write('\n')
@@ -51,8 +47,8 @@ def db_file_add(path):
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
-def db_file_remove(path):
-    #print 'Remove: ' + str(path)
+def db_file_remove(ppath):
+    path = ops.getsKeyNameFromPath(ppath)
     fil = open(PATHDB, 'r+')
     cfil = open(PATHDB + '_1', 'w+')
     for line in fil:
@@ -94,6 +90,11 @@ def handle_request (tname, tnum, command, path, seg, imp):
     while loop > 0:
         # Get the proper cloud's object
         pf = profile_keys[idx]
+
+        # If segregated listing in requested, do it
+        if seg == 1:
+            tmsg += pf['rtype'] + ' profile ' + str(idx) + ':\n'
+
         if pf['rtype'] == 'AWS':
             # Lets not make AWS or Azure connections here
             # Lets make them in their respective classes
