@@ -1,17 +1,20 @@
+import os
 import sys
 import ops
 import thread
 import SocketServer
+import network_test
+from os.path import expanduser
 from aws_ops import aws_operations
 from azure_ops import AzureOperations
-import network_test
 
 #****************#
 # TUNABLE PARAMS #
 #****************#
 SERVERPORT = 7070  # Default port on which the server listens
 MAX_THREADS = 100
-
+homepath = path = expanduser('~')
+PATHDB = homepath + '/.cloudifier/path_db'
 
 
 #****************#
@@ -30,23 +33,35 @@ def getsNetworkProfile():
     # profile_keys array that you should use as your cloud provider
     # Right now I am not implemented so I return 0
     # TODO
-    profile_keys_idx = network_test.getNetworkProfile()
-    print profile_keys_idx
-    return profile_keys_idx[0]
+    #profile_keys_idx = network_test.getNetworkProfile()
+    #print profile_keys_idx
+    #return profile_keys_idx[0]
+    return 0
 
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
 def db_file_add(path):
-    # TODO
-    print 'Add: ' + str(path)
+    print 'Add: ' + str(PATHDB) + str(path)
+    fil = open(PATHDB, 'a')
+    fil.write(path)
+    fil.write('\n')
+    fil.close()
     return 0
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
 def db_file_remove(path):
-    # TODO
-    print 'Remove: ' + str(path)
+    #print 'Remove: ' + str(path)
+    fil = open(PATHDB, 'r+')
+    cfil = open(PATHDB + '_1', 'w+')
+    for line in fil:
+        if path not in line:
+            cfil.write(line)
+    fil.close()
+    cfil.close()
+    os.system('rm ' + PATHDB)
+    os.system('mv ' + PATHDB + '_1 ' + PATHDB)
     return 0
 
 
@@ -88,15 +103,23 @@ def handle_request(tname, tnum, command, path, seg, imp):
 
         # Run the appropriate operation
         if (command == 0):
+            # Add file
             db_file_add(properpath)
             obj.put()
         elif (command == 1):
+            # Remove file
             db_file_remove(properpath)
             obj.delete()
         elif (command == 2):
+            # List everything
+            obj.get()
+        elif (command == 3):
+            # show added
+            os.system('cat ' + PATHDB)
+        elif (command == 4):
+            #download
             obj.get()
         else:
-            # TODO more ops
             continue
     return 0
 

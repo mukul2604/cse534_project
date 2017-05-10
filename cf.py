@@ -13,6 +13,7 @@ def printsHelp():
     print("\tpython cf.py --add <filename>")
     print("\tpython cf.py --add <filename> --imp")
     print("\tpython cf.py --rem <filename>")
+    print("\tpython cf.py --download <filename>")
     print("\tpython cf.py --list")
     print("\tpython cf.py --list --segragate")
     print("\tpython cf.py --show-added")
@@ -26,7 +27,7 @@ def main(argv):
     important = False
 
     try:
-        opts, args = getopt.getopt(argv,"a:r:lsgi",["add=","remove=","list","show-added","segragate","imp"])
+        opts, args = getopt.getopt(argv,"a:r:d:lsgi",["add=","remove=","download=","list","show-added","segragate","imp"])
     except getopt.GetoptError:
         printsHelp()
         sys.exit(-1)
@@ -41,6 +42,9 @@ def main(argv):
             command = 2
         elif opt in ("-s", "--show-added"):
             command = 3
+        elif opt in ("-d", "--download"):
+            filename = arg
+            command = 4
         elif opt in ("-g", "--segragate"):
             segragate = True
         elif opt in ("-i", "--imp"):
@@ -49,9 +53,13 @@ def main(argv):
             printsHelp()
             sys.exit(0)
 
-    if ((command == 0) or (command == 1)) and filename == '':
-        print("Filename required with add or remove")
+    if ((command == 0) or (command == 1) or (command == 4)) and filename == '':
+        print("Filename required with add, remove and download")
         sys.exit(0)
+
+    # Commands
+    # 0: add | 1: remove | 2: list |
+    # 3: show-added | 4: download
 
     # COMMAND | FILENAME | SEGRAGATE | IMPORTANT
     command_str = ''
