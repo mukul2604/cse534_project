@@ -20,7 +20,6 @@ def printsHelp():
     return 0
 
 def main(argv):
-    #global profile_keys
     filename = ''
     command = 0
     segragate = False
@@ -39,6 +38,7 @@ def main(argv):
             filename = arg
             command = 1
         elif opt in ("-l", "--list"):
+            important = True
             command = 2
         elif opt in ("-s", "--show-added"):
             command = 3

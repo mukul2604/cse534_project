@@ -2,7 +2,7 @@ import os
 import sys
 import ops
 import time
-import thread
+import threading
 import SocketServer
 import network_test
 from os.path import expanduser
@@ -188,12 +188,15 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 
         this_thread_id = next_tid % MAX_THREADS
         try:
-            thread.start_new_thread(handle_request,
-            (threadname, this_thread_id, command, words[1], segragate, imp))
+            t = threading.Thread(target=handle_request, args=(threadname, this_thread_id, command, words[1], segragate, imp,))
+            t.start()
+            t.join()
+            #thread.start_new_thread(handle_request,
+            #(threadname, this_thread_id, command, words[1], segragate, imp))
         except Exception as e:
             print('ERROR: Could not start server thread. ' + str(e))
             resp = 'Request failed: ' + str(e)
-        time.sleep(TWAIT_TIMER)
+        #time.sleep(TWAIT_TIMER)
         print('================================\n')
         self.request.sendall(threadreturns[this_thread_id])
         return 0
