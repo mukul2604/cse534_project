@@ -19,7 +19,6 @@ class aws_operations(operations):
         # TODO <<<<<<
         # More sophesticated code. If bucketname is empty then new random name
         # create that bucket and update keys.csv accordingly
-        # <<<<<<
 
         # If this is the first access to this profile then create the bucket
         # else create_bucket will raise exception. Then you get() this bucket.
@@ -31,37 +30,41 @@ class aws_operations(operations):
 
 
     def get(self):
+        ret = ''
         if (self.path is None) or (self.path == ''):
             # We are trying to list everything - eg. for ls command
-            print('The following objects are available in the cloud:')
+            ret += 'The following objects are available in the cloud:\n'
             for item in self.bucket_obj.list():
                 sitem = str(item)
                 sitem = sitem[1:-1]
                 words = sitem.strip().split(',')
                 pretty_item = words[1]
-                print(pretty_item)
-            print(' ')
+                ret += pretty_item + '\n'
         else:
+            ret += 'Done'
             k = Key(self.bucket_obj)
             k.key = getsKeyNameFromPath(self.path)
             k.get_contents_to_filename(getsKeyNameFromPath(self.path))
-        return 0
+        return ret
 
     def put(self):
+        ret = 'Done'
         keyname = getsKeyNameFromPath(self.path)
         k = Key(self.bucket_obj)
         k.key = keyname
         k.set_contents_from_filename(self.path)
-        return 0
+        return ret
 
     def delete(self):
+        ret = 'Done'
         keyname = getsKeyNameFromPath(self.path)
         k = Key(self.bucket_obj)
         k.key = keyname
         k.delete()
-        return 0
+        return ret
 
 
     def checkExists(self):
+        ret = ''
         print("AWS check exists")
-
+        return ret

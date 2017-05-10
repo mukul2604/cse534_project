@@ -83,7 +83,7 @@ def main(argv):
     try:
         sock.connect((SERVERHOST, SERVERPORT))
         sock.sendall(command_str)
-        received = sock.recv(16)
+        received = sock.recv(1024)
     except Exception as e:
         print ("ERROR: Failed to connect to " + SERVERHOST + ". Reason: " + str(e))
     finally:
@@ -93,7 +93,6 @@ def main(argv):
         pass
     else:
         print(received)
-
     return 0
 
 if __name__ == "__main__":

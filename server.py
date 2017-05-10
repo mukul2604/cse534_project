@@ -1,6 +1,7 @@
 import os
 import sys
 import ops
+import time
 import thread
 import SocketServer
 import network_test
@@ -12,20 +13,20 @@ from azure_ops import AzureOperations
 # TUNABLE PARAMS #
 #****************#
 SERVERPORT = 7070  # Default port on which the server listens
-MAX_THREADS = 100
+MAX_THREADS = 100  # How many parallel requests can be handled
 homepath = path = expanduser('~')
-PATHDB = homepath + '/.cloudifier/path_db'
-
+PATHDB = homepath + '/.cloudifier/path_db' # Where is the DB of added files
+TWAIT_TIMER = 1 # How long to wait for a thread (sec)
 
 #****************#
 # DO NOT FIDDLE  #
 #****************#
 
 profile_keys = ops.getsProfileKeys()
-#threadreturns = [] # threads can update their own index element for ret status
+threadreturns = [] # threads can update their own index element for ret status
 next_tid = 0
-#for i in range(MAX_THREADS):    # Ask mukul
-#    threadreturns.append(0)
+for i in range(MAX_THREADS):
+    threadreturns.append('OK')
 
 
 def getsNetworkProfile():
@@ -39,10 +40,9 @@ def getsNetworkProfile():
     return 0
 
 
-
 # Add remove the full path of the file from ~/.cloudifier/path_db file
 def db_file_add(path):
-    print 'Add: ' + str(PATHDB) + str(path)
+    #print 'Add: ' + str(PATHDB) + str(path)
     fil = open(PATHDB, 'a')
     fil.write(path)
     fil.write('\n')
@@ -69,8 +69,9 @@ def db_file_remove(path):
 # We want to handle the case where an upload of 500 MB file can
 # continue in background while CLI and the server are free to
 # accept more requests
-ef handle_request(tname, tnum, command, path, seg, imp):
+def handle_request (tname, tnum, command, path, seg, imp):
     global profile_keys
+    global threadreturns
 
     # User might give relative or abs path
     # Convert everything to absolute
@@ -80,18 +81,17 @@ ef handle_request(tname, tnum, command, path, seg, imp):
     pf = None
     idx = 0
     loop = 0
+    tmsg = ''
+
+    # imp = 1 implies that we have to run the op for
+    # all the clouds
     if (imp == 1):
         loop = len(profile_keys)
-        idx = 0
     else:
         loop = 1
         idx = getsNetworkProfile()
 
-
-    # <<<<<<<< TODO What happens when sending fails?
     while loop > 0:
-        loop -= 1
-
         # Get the proper cloud's object
         pf = profile_keys[idx]
         if pf['rtype'] == 'AWS':
@@ -104,25 +104,45 @@ ef handle_request(tname, tnum, command, path, seg, imp):
             obj = aws_operations(profile_keys, 0, properpath) #<<<<<< TODO
 
         # Run the appropriate operation
-        if (command == 0):
-            # Add file
-            db_file_add(properpath)
-            obj.put()
-        elif (command == 1):
-            # Remove file
-            db_file_remove(properpath)
-            obj.delete()
-        elif (command == 2):
-            # List everything
-            obj.get()
-        elif (command == 3):
-            # show added
-            os.system('cat ' + PATHDB)
-        elif (command == 4):
-            #download
-            obj.get()
-        else:
-            continue
+        try:
+            ret = ''
+            if (command == 0):
+                # Add file
+                db_file_add(properpath)
+                ret = obj.put()
+            elif (command == 1):
+                # Remove file
+                db_file_remove(properpath)
+                ret = obj.delete()
+            elif (command == 2):
+                # List everything
+                ret = obj.get()
+            elif (command == 3):
+                # show added
+                fil = open(PATHDB, 'r+')
+                for line in fil:
+                    line = line.strip()
+                    ret += line
+                    ret += '\n'
+                fil.close()
+            elif (command == 4):
+                #download
+                ret = obj.get()
+            else:
+                pass
+            tmsg += ret + '\n'
+        except Exception as e:
+            tmsg += str(e) + '\n'
+
+        # If the file is important, we loop
+        # over every cloud available to us
+        loop -= 1
+        if (imp == 1):
+            idx += 1
+
+    print ("\nResponse for thread " + str(tnum) + ":\n" + tmsg)
+    threadreturns[tnum] = ''
+    threadreturns[tnum] = tmsg
     return 0
 
 # Can this string be safely converted to int?
@@ -135,6 +155,7 @@ def isInteger(n):
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
+        global threadreturns
         global next_tid
         resp = 'OK'
         imp = -1
@@ -145,13 +166,11 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         self.data = self.request.recv(4200).strip()
         words = self.data.split('|')
 
-        #<<<<<<<<
+        print('================================')
         print("Command: " + words[0])
         print("Filename: " + words[1])
         print("Segragate: " + words[2])
         print("Important file: " + words[3])
-        print(' ')
-        #<<<<<<<<
 
         next_tid += 1
         threadname = 'request_' + str(next_tid)
@@ -163,13 +182,16 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         if (isInteger(words[3])):
             imp = int(words[3])
 
+        this_thread_id = next_tid % MAX_THREADS
         try:
             thread.start_new_thread(handle_request,
-            (threadname, next_tid % MAX_THREADS, command, words[1], segragate, imp))
+            (threadname, this_thread_id, command, words[1], segragate, imp))
         except Exception as e:
             print('ERROR: Could not start server thread. ' + str(e))
             resp = 'Request failed: ' + str(e)
-        self.request.sendall(resp)
+        time.sleep(TWAIT_TIMER)
+        print('================================\n')
+        self.request.sendall(threadreturns[this_thread_id])
         return 0
 
 
