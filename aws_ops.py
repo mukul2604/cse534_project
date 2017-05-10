@@ -35,8 +35,16 @@ class aws_operations(operations):
             # We are trying to list everything - eg. for ls command
             print('The following objects are available in the cloud:')
             for item in self.bucket_obj.list():
-                print item
+                sitem = str(item)
+                sitem = sitem[1:-1]
+                words = sitem.strip().split(',')
+                pretty_item = words[1]
+                print(pretty_item)
             print(' ')
+        else:
+            k = Key(self.bucket_obj)
+            k.key = getsKeyNameFromPath(self.path)
+            k.get_contents_to_filename(getsKeyNameFromPath(self.path))
         return 0
 
     def put(self):

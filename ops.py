@@ -62,15 +62,14 @@ def getsProfileKeys():
         print("Failed to fetch cloud accessing keys!")
         sys.exit(0)
 
-    properties = ['rid',
-                  'rtype',
+    properties = ['rtype',
                   'accesskey',
                   'secretkey',
                   'bucketname']
 
     filreader = csv.DictReader(fil)
     for row in filreader:
-        prec = {'rid': '', 'rtype': '', 'access': '', 'secret': '', 'bucket': ''}
+        prec = {'rtype': '', 'access': '', 'secret': '', 'bucket': ''}
         for vname in properties:
             if row[vname]:
                 prec[vname] = row[vname]
