@@ -16,7 +16,7 @@ SERVERPORT = 7070  # Default port on which the server listens
 MAX_THREADS = 100  # How many parallel requests can be handled
 homepath = expanduser('~')
 PATHDB = homepath + '/.cloudifier/path_db' # Where is the DB of added files
-TWAIT_TIMER = 1 # How long to wait for a thread (sec)
+NW_UPDATE_DELAY = 30 # Seconds after which the network conditions should be checked
 
 #****************#
 # DO NOT FIDDLE  #
@@ -28,11 +28,14 @@ next_tid = 0
 for i in range(MAX_THREADS):
     threadreturns.append('OK')
 
-
-def getsNetworkProfile():
-    profile_keys_idx = network_test.getNetworkProfile()
-    print (profile_keys_idx)
-    return profile_keys_idx[0]
+# Network monitoring functionality. Runs as a separate thread.
+nwMonitoringKeys = []
+def nwMonitoringRunner():
+    global nwMonitoringKeys
+    while True:
+        nwMonitoringKeys = network_test.getNetworkProfile()
+        time.sleep(NW_UPDATE_DELAY)
+    return 0
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file
@@ -86,7 +89,7 @@ def handle_request (tname, tnum, command, path, seg, imp):
         loop = len(profile_keys)
     else:
         loop = 1
-        idx = getsNetworkProfile()
+        idx = nwMonitoringKeys[0]
 
     while loop > 0:
         # Get the proper cloud's object
@@ -191,18 +194,19 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             t = threading.Thread(target=handle_request, args=(threadname, this_thread_id, command, words[1], segragate, imp,))
             t.start()
             t.join()
-            #thread.start_new_thread(handle_request,
-            #(threadname, this_thread_id, command, words[1], segragate, imp))
         except Exception as e:
             print('ERROR: Could not start server thread. ' + str(e))
             resp = 'Request failed: ' + str(e)
-        #time.sleep(TWAIT_TIMER)
         print('================================\n')
         self.request.sendall(threadreturns[this_thread_id])
         return 0
 
 
 def main():
+    # Start the network monitoring thread
+    #nwMonitoringRunner
+    nwt = threading.Thread(target=nwMonitoringRunner)
+    nwt.start()
     # Start the server thread
     print("Starting the server")
     server = SocketServer.TCPServer(('0.0.0.0', SERVERPORT), MyTCPHandler)
