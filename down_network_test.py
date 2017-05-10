@@ -12,11 +12,6 @@ import csv
 import os
 import sys
 
-flag = False
-
-if (len(sys.argv)>1):
-    flag = True
-
 def getNetworkProfile():
     filename='1Mb.txt'
     key_path = os.path.expanduser('~/.cloudifier/keys.csv')
@@ -30,37 +25,31 @@ def getNetworkProfile():
     index=0
     for row in rows:
         outfile = str(row['rtype']) + "_10MB_" + str(row['bucketname'])
-        print ""
+#        print outfile
         if (row['rtype']=='AZURE'):
+            print row['bucketname']
             try:
-                if (flag):
-                    print "Bucket Name: ", str(row['bucketname'])
-
                 block_blob_service = None
                 block_blob_service = BlockBlobService(account_name=row['accesskey'], account_key=row['secretkey'])
 
                 start_time = time.time()
-                block_blob_service.create_blob_from_path(
+                block_blob_service.get_blob_to_path(
                 row['bucketname'],
                 outfile,
-                filename
+                outfile
                 )
                 end_time = time.time()
                 result.append (end_time - start_time)
-                if (flag):
-                    print "Response Time: " + str(result[index])
+                print result[index]
                 index = index +1
-            except Exception as e:
-                print str(e)
+            except:
                 result.append(sys.maxsize)
                 index = index +1
                 print "Error Connecting to", row['rtype'], " bucket: ", row['bucketname']
 
         elif (row['rtype']=='AWS'):
+            print row['bucketname']   
             try:
-                if (flag):
-                    print "Bucket Name: ", str(row['bucketname'])
-                
                 c = S3Connection(row['accesskey'], row['secretkey'])
                 b = c.get_bucket(row['bucketname']) # substitute your bucket name here
         
@@ -73,12 +62,11 @@ def getNetworkProfile():
                 k = Key(b)
                 k.key = outfile
                 start_time = time.time()
-                k.set_contents_from_filename(filename)
+                k.get_contents_to_filename(outfile)
                 end_time = time.time()
 
                 result.append (end_time - start_time)
-                if (flag):
-                    print "Response Time: " + str(result[index])
+                print result[index]
                 index = index +1
             except:
                 result.append(sys.maxsize)
@@ -90,7 +78,7 @@ def getNetworkProfile():
 #    print min_index
 
     net_profiles = [i[0] for i in sorted(enumerate(result), key=lambda x:x[1])]
-    print "Profile Indices: ", str(net_profiles)
+    print net_profiles
     return net_profiles
 
 def main():
