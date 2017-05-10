@@ -105,7 +105,7 @@ def handle_request (tname, tnum, command, path, seg, imp):
         elif pf['rtype'] == 'AZURE':
             obj = azure_operations(profile_keys, idx, properpath)
         else:
-            obj = aws_operations(profile_keys, 0, properpath) #<<<<<< TODO
+            print("Unknown service type")
 
         # Run the appropriate operation
         try:

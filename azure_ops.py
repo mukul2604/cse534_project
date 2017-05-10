@@ -25,17 +25,15 @@ class azure_operations(operations):
     def get(self):
         ret = ''
         if (self.path is None) or (self.path == ''):
-            ret += 'The following objects are available in the cloud:\n'
-
             generator = self.block_blob_service.list_blobs(self.bucket_name)
             for blob in generator:
-                ret += blob.name
+                ret += blob.name + "\n"
         else:
             path = getsKeyNameFromPath(self.path)
             self.block_blob_service.get_blob_to_path(self.bucket_name,
                                                            path,
                                                            path)
-            ret += 'Done'
+            ret += 'Download Done'
 
         return ret
 
@@ -46,19 +44,17 @@ class azure_operations(operations):
             path,  # to be uploaded object
             path,   # real file path
         )
-        print("Azure put")
-        return 0
+        return "Put Done"
 
     def delete(self):
         path = getsKeyNameFromPath(self.path)
         self.block_blob_service.delete_block(self.bucket_name, path)
-        print("Azure delete")
-        return 0
+        return "Delete Done"
 
     def create(self):
         # create container
-        return 0
+        return "Done"
 
     def checkExists(self):
         print("Azure check exists")
-        return 0
+        return "Done"
