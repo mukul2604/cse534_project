@@ -56,6 +56,11 @@ Who will our CLI ask the network stats from:
         A running process - Who starts it? What happens if it crashed?
         Read from a file that a background process keeps updating - Synchronization
 
+
+Fetch file from cloud
+Fetch imp from nearest cloud
+
+
 Nice to have
 ------------
 Automatic background running server which updates files on the cloud or resurects them

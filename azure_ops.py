@@ -35,11 +35,17 @@ class azure_operations(operations):
             self.path,   # real file path
         )
         print("Azure put")
+        return 0
 
     def delete(self):
         self.block_blob_service.delete_block(self.bucket_name, self.path + 'blob')
         print("Azure delete")
+        return 0
+
+    def create(self):
+        # create container
+        return 0
 
     def checkExists(self):
         print("Azure check exists")
-
+        return 0
