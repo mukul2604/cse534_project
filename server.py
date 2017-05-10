@@ -30,10 +30,9 @@ for i in range(MAX_THREADS):
 
 
 def getsNetworkProfile():
-    #profile_keys_idx = network_test.getNetworkProfile()
-    #print profile_keys_idx
-    #return profile_keys_idx[0]
-    return 0
+    profile_keys_idx = network_test.getNetworkProfile()
+    print (profile_keys_idx)
+    return profile_keys_idx[0]
 
 
 # Add remove the full path of the file from ~/.cloudifier/path_db file

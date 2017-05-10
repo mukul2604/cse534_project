@@ -33,7 +33,6 @@ class aws_operations(operations):
         ret = ''
         if (self.path is None) or (self.path == ''):
             # We are trying to list everything - eg. for ls command
-            ret += 'The following objects are available in the cloud:\n'
             for item in self.bucket_obj.list():
                 sitem = str(item)
                 sitem = sitem[1:-1]
