@@ -1,4 +1,5 @@
 from ops import operations
+from ops import getsKeyNameFromPath
 from azure.storage.blob import BlockBlobService
 from azure.storage.blob import PublicAccess
 
@@ -22,23 +23,35 @@ class azure_operations(operations):
             pass
 
     def get(self):
-        content = self.block_blob_service.get_blob_to_path(self.bucket_name,
-                                                           self.path + 'blob',
-                                                           self.path)
-        print("Azure get")
-        return content
+        ret = ''
+        if (self.path is None) or (self.path == ''):
+            ret += 'The following objects are available in the cloud:\n'
+
+            generator = self.block_blob_service.list_blobs(self.bucket_name)
+            for blob in generator:
+                ret += blob.name
+        else:
+            path = getsKeyNameFromPath(self.path)
+            self.block_blob_service.get_blob_to_path(self.bucket_name,
+                                                           path,
+                                                           path)
+            ret += 'Done'
+
+        return ret
 
     def put(self):
+        path = getsKeyNameFromPath(self.path)
         self.block_blob_service.create_blob_from_path(
             self.bucket_name,  # container  should user provide the name
-            self.path + 'blob',  # to be uploaded object
-            self.path,   # real file path
+            path,  # to be uploaded object
+            path,   # real file path
         )
         print("Azure put")
         return 0
 
     def delete(self):
-        self.block_blob_service.delete_block(self.bucket_name, self.path + 'blob')
+        path = getsKeyNameFromPath(self.path)
+        self.block_blob_service.delete_block(self.bucket_name, path)
         print("Azure delete")
         return 0
 
