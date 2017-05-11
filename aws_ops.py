@@ -39,14 +39,14 @@ class aws_operations(operations):
                 pretty_item = words[1]
                 ret += pretty_item + '\n'
         else:
-            ret += 'Done'
+            ret += 'Download Done'
             k = Key(self.bucket_obj)
             k.key = getsKeyNameFromPath(self.path)
             k.get_contents_to_filename(getsKeyNameFromPath(self.path))
         return ret
 
     def put(self):
-        ret = 'Done'
+        ret = 'Put Done'
         keyname = getsKeyNameFromPath(self.path)
         k = Key(self.bucket_obj)
         k.key = keyname
@@ -54,7 +54,7 @@ class aws_operations(operations):
         return ret
 
     def delete(self):
-        ret = 'Done'
+        ret = 'Delete Done'
         keyname = getsKeyNameFromPath(self.path)
         k = Key(self.bucket_obj)
         k.key = keyname

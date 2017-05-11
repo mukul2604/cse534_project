@@ -30,7 +30,8 @@ def getNetworkProfile():
     index=0
     for row in rows:
         outfile = str(row['rtype']) + "_10MB_" + str(row['bucketname'])
-        print ""
+        if flag:
+            print ""
         if (row['rtype']=='AZURE'):
             try:
                 if (flag):

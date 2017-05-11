@@ -48,7 +48,7 @@ class azure_operations(operations):
 
     def delete(self):
         path = getsKeyNameFromPath(self.path)
-        self.block_blob_service.delete_block(self.bucket_name, path)
+        self.block_blob_service.delete_blob(self.bucket_name, path)
         return "Delete Done"
 
     def create(self):

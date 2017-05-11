@@ -16,7 +16,7 @@ SERVERPORT = 7070  # Default port on which the server listens
 MAX_THREADS = 100  # How many parallel requests can be handled
 homepath = expanduser('~')
 PATHDB = homepath + '/.cloudifier/path_db' # Where is the DB of added files
-NW_UPDATE_DELAY = 30 # Seconds after which the network conditions should be checked
+NW_UPDATE_DELAY = 60 # Seconds after which the network conditions should be checked
 
 #****************#
 # DO NOT FIDDLE  #
